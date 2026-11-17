@@ -1,0 +1,32 @@
+# Security-sensitive automation and developer configuration
+/.github/ @Fatima0105
+/.vscode/ @Fatima0105
+/.devcontainer/ @Fatima0105
+/.githooks/ @Fatima0105
+/scripts/ @Fatima0105
+
+# Package manifests, lockfiles, and lifecycle configuration
+**/package.json @Fatima0105
+**/package-lock.json @Fatima0105
+**/pnpm-lock.yaml @Fatima0105
+**/yarn.lock @Fatima0105
+/.npmrc @Fatima0105
+/.pnpmfile.cjs @Fatima0105
+
+# Binary and font assets
+*.eot @Fatima0105
+*.llf @Fatima0105
+*.lfk @Fatima0105
+*.otf @Fatima0105
+*.ttf @Fatima0105
+*.wasm @Fatima0105
+*.woff @Fatima0105
+*.woff2 @Fatima0105
+
+# Build and framework configuration
+/eslint.config.* @Fatima0105
+/next.config.* @Fatima0105
+/postcss.config.* @Fatima0105
+/tailwind.config.* @Fatima0105
+/tsconfig*.json @Fatima0105
+/vitest.config.* @Fatima0105

@@ -11,11 +11,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "security:malware-scan": "node scripts/malware-scan.mjs",
     "typecheck": "tsc --noEmit",
     "check:env": "node scripts/check-public-env.mjs",
     "check:secrets": "node scripts/check-secrets.mjs",
     "verify": "pnpm check:env && pnpm check:secrets && pnpm typecheck && pnpm lint && pnpm test",
     "test": "vitest run --passWithNoTests",
+    "test:malware-scan": "node --test scripts/malware-scan.test.mjs",
     "test:watch": "vitest"
   },
   "dependencies": {

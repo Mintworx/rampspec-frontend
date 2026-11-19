@@ -5,6 +5,8 @@ import { useMemo, useState, type FormEvent } from "react";
 
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
+import { useWizardDraft, WizardProblem } from "@/components/run-wizard-state";
+import { validateWizardDraft, wizardHref } from "@/lib/runs/wizard";
 import { ApiClient, ApiError } from "@/lib/api";
 import {
   submitReferenceRun,
@@ -19,6 +21,8 @@ const ids = {
 } as const;
 
 export default function SubmitRunPage() {
+  const { draft, error: draftError, startNew } = useWizardDraft();
+  const draftErrors = draft ? validateWizardDraft(draft, "submit") : [];
   const [idempotencyKey] = useState(() => `reviewer-${crypto.randomUUID()}`);
   const [targetOrigin, setTargetOrigin] = useState("");
   const [result, setResult] = useState<ReferenceRunResult>();
@@ -29,13 +33,14 @@ export default function SubmitRunPage() {
       new ApiClient({
         baseUrl:
           process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:4000",
-        getOrganizationId: () => ids.organization,
+        getOrganizationId: () => draft?.organizationId,
       }),
-    [],
+    [draft?.organizationId],
   );
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!draft || validateWizardDraft(draft, "submit").length || submitting) return;
     setSubmitting(true);
     setError(undefined);
     setResult(undefined);
@@ -49,6 +54,7 @@ export default function SubmitRunPage() {
             suiteVersion: "1.0.0",
             targetId: ids.target,
             targetOrigin,
+            effectiveConfig: { fixture: draft.fixture, timeoutSeconds: Number(draft.timeout), selectedTargetId: draft.targetId, selectedSuiteId: draft.suiteId },
           },
           idempotencyKey,
         ),
@@ -64,6 +70,7 @@ export default function SubmitRunPage() {
     }
   }
 
+  if (!draft) return <AppShell title="Run the SEP-1 reference check"><WizardProblem error={draftError} onStartNew={startNew} /></AppShell>;
   return (
     <AppShell
       title="Run the SEP-1 reference check"
@@ -74,6 +81,8 @@ export default function SubmitRunPage() {
           onSubmit={submit}
           className="rounded-lg border border-line bg-surface p-6 shadow-panel"
         >
+          <div className="mb-5 text-sm"><p>Draft fixture: {draft.fixture}</p><p>Draft timeout: {draft.timeout} seconds</p><a className="underline" href={wizardHref("/runs/new/parameters", draft)}>Back to parameters</a></div>
+          {draftErrors.length > 0 && <p role="alert">{draftErrors.join(" ")}</p>}
           <label
             className="block text-sm font-semibold"
             htmlFor="target-origin"
@@ -112,7 +121,7 @@ export default function SubmitRunPage() {
             </div>
           )}
 
-          <Button className="mt-6" type="submit" disabled={submitting}>
+          <Button className="mt-6" type="submit" disabled={submitting || draftErrors.length > 0}>
             {submitting ? (
               <>
                 <Loader2 className="animate-spin" size={16} /> Running check

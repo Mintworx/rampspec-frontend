@@ -6,6 +6,7 @@ export type ReferenceRunInput = {
   suiteVersion: string;
   targetId: string;
   targetOrigin: string;
+  effectiveConfig?: Readonly<Record<string, unknown>>;
 };
 
 export type ReferenceRunResult = {

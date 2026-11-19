@@ -1,6 +1,11 @@
 # Leaving edited run parameters
 
 The parameter form compares fixture and timeout against its initial values.
+When combined with wizard draft persistence, the baseline is the restored draft
+on entry, rather than hard-coded defaults. Edits remain saved in the scoped tab
+draft; the warning concerns changes not yet reviewed for submission. Leaving
+does not erase that draft. Review safety accepts the current parameters without
+a duplicate warning.
 Equivalent numeric timeouts and reverting edits do not warn. Empty/invalid
 changes remain dirty. Advancing through Review safety is an intentional form
 commit; native number constraints must pass before navigation.

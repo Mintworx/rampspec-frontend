@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { useWizardDraft, WizardProblem } from "@/components/run-wizard-state";
-import { validateWizardDraft, wizardHref } from "@/lib/runs/wizard";
+import { validateWizardDraft, wizardHref, type WizardDraft } from "@/lib/runs/wizard";
 import { ApiClient, ApiError } from "@/lib/api";
 import {
   submitReferenceRun,
@@ -23,8 +23,12 @@ const ids = {
 } as const;
 
 export default function SubmitRunPage() {
-  const { draft, error: draftError, startNew } = useWizardDraft();
-  const draftErrors = draft ? validateWizardDraft(draft, "submit") : [];
+  const { draft, error, startNew } = useWizardDraft();
+  return draft ? <SubmitDraft key={`${draft.organizationId}:${draft.id}`} draft={draft} /> : <AppShell title="Run the SEP-1 reference check"><WizardProblem error={error} onStartNew={startNew} /></AppShell>;
+}
+
+function SubmitDraft({ draft }: { draft: WizardDraft }) {
+  const draftErrors = validateWizardDraft(draft, "submit");
   const [idempotencyKey, setIdempotencyKey] = useState(() => `reviewer-${crypto.randomUUID()}`);
   const [targetOrigin, setTargetOrigin] = useState("");
   const [result, setResult] = useState<ReferenceRunResult>();
@@ -90,7 +94,6 @@ export default function SubmitRunPage() {
     }
   }
 
-  if (!draft) return <AppShell title="Run the SEP-1 reference check"><WizardProblem error={draftError} onStartNew={startNew} /></AppShell>;
   return (
     <AppShell
       title="Run the SEP-1 reference check"
